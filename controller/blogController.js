@@ -86,7 +86,7 @@ const approveBlogByAdminController = async (req, res) => {
 // logic for displaying approved blog to dashboard
 const displayApprovedBlogToDashboardController = async (req, res) => {
   try {
-    const blog = await blogModel.find({ isAdminApproved: 'Approved' })
+    const blog = await blogModel.find({ isAdminApproved: 'Approved' }).populate('user')
     if (blog) {
       return res.status(200).send({
         success: true,

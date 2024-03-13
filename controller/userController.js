@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Blog = require('../models/blogModel')
 const jwt = require('jsonwebtoken')
 // logic for register
 const userRegisterController = async (req, res) => {
@@ -93,6 +94,7 @@ const deleteUserAccountController = async (req, res) => {
   try {
     const { id } = req.params
     console.log('inside delete blog');
+    const deleteAllBlogs = await Blog.deleteMany({user:id})
     const deletedUser = await User.findByIdAndDelete(id)
     const remainingUser = await User.find({})
     return res.status(200).send({
