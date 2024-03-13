@@ -1,5 +1,6 @@
 const express = require('express')
-const { userRegisterController, userLoginController, allRegisteredUsersController } = require('../controller/userController')
+const { userRegisterController, userLoginController, allRegisteredUsersController, deleteUserAccountController } = require('../controller/userController');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router()
 
@@ -10,6 +11,9 @@ router.post('/register', userRegisterController)
 router.post("/login", userLoginController);
 
 // for all users
-router.get('/all-registered-users',allRegisteredUsersController)
+router.get('/all-registered-users',authMiddleware, allRegisteredUsersController)
+
+//for deleting account
+router.delete('/delete/:id',authMiddleware,deleteUserAccountController)
 
 module.exports = router

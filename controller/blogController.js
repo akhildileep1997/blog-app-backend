@@ -3,40 +3,35 @@ const BlogModel = require("../models/blogModel");
 const User = require("../models/userModel");
 
 // logic for adding blog
+
 const addBlogController = async (req, res) => {
   try {
-    console.log("inside add blog api");
-    const { title, subTitle, content, imageUrl, userId } = req.body;
-    const userCheck = await User.findOne({ userId });
-    if (userCheck) {
-      const newBlog = new BlogModel({
-        title,
-        subTitle,
-        content,
-        imageUrl,
-        userId,
-      });
-      await newBlog.save();
-      return res.status(200).send({
-        success: true,
-        message: "blog added successfully",
-        blog: newBlog,
-      });
-    } else {
-      return res.status(200).send({
-        success: false,
-        message: "user id entered is incorrect",
-      });
-    }
+    const { title, subTitle, content, imageUrl } = req.body;
+    const newBlog = new BlogModel({
+      title,
+      subTitle,
+      content,
+      imageUrl,
+      user: req.user,
+    });
+    await newBlog.save();
+    return res.status(200).send({
+      success: true,
+      message: "blog added successfully",
+      blog: newBlog,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).send({
       message: "something went wrong while adding the blog",
       success: false,
-      error,
+      error: error.message,
     });
   }
 };
+
+module.exports = { addBlogController };
+
 
 //logic for displaying blog in admin page
 const adminPageDisplayBlogController = async (req, res) => {
@@ -67,8 +62,10 @@ const adminPageDisplayBlogController = async (req, res) => {
 //logic for approving the blog by the admin
 const approveBlogByAdminController = async (req, res) => {
   try {
+    console.log('inside admin approved api');
     const { id } = req.params;
-    const blog = await BlogModel.findOne({ _id: id });
+    console.log(id);
+    const blog = await BlogModel.findByIdAndUpdate(id);
     blog.isAdminApproved = "Approved";
     await blog.save();
     return res.status(200).send({
@@ -81,7 +78,7 @@ const approveBlogByAdminController = async (req, res) => {
     res.status(500).send({
       message: "something went wrong while approving the blog",
       success: false,
-      error,
+      error:error.message,
     });
   }
 };
@@ -118,7 +115,7 @@ const displayAllAddedBlogsByUserToTheirAccountController = async (req, res) => {
     console.log('inside user added blog api');
     const id = req.params.id
     console.log(id);
-    const blog = await blogModel.find({ userId: id })
+    const blog = await blogModel.find({ user: id })
     if (blog) {
       res.status(200).send({
         success: true,
